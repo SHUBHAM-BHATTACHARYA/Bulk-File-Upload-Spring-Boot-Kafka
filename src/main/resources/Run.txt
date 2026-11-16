@@ -1,0 +1,10 @@
+
+How to Test in Swagger UI
+
+1. Start SQL Server and Apache Kafka (via Docker or local installation).
+2. Run the Spring Boot application and open http://localhost:8080/swagger-ui/index.html.
+3. Upload: Expand POST /api/files/upload, click Try it out, select multiple files using the file picker, and execute. Copy the returned batchId and documentIds.
+4. Verify: Call GET /api/files/status/{batchId} to confirm the Kafka consumer updated the status from PROCESSING to COMPLETED.
+5. Download: Expand GET /api/files/download, enter your documentIds (e.g., 1,2), and execute. Swagger UI will render a Download file link for attachments.zip.
+
+I want to upload multiple attachments in the sql server through java spring boot swagger and also want to download multiple attachments through java spring boot swagger what will be the best system design for that? I want to implement kafka also

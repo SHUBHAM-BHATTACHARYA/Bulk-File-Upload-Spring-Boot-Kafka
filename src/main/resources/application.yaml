@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: bulkFileUpload
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=FileStorageDB;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: admin
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 250MB
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+    consumer:
+      group-id: file-processor-group
+      auto-offset-reset: earliest
+      # Wrap with ErrorHandlingDeserializer to prevent crash loops
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        # Delegate to the actual deserializers
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+
+        # Trust your DTO package and set default target type
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.example.shubham.fileservice.bulkFileUpload.dto.FileUploadEvent
+
+app:
+  staging-dir: ./temp-uploads
+  kafka:
+    topic: file-upload-events
